@@ -60,6 +60,7 @@ for tc in range(10):
         real_max = max_V
     else :
         real_max = max_V2
+    print(f'#{tc + 1} {real_max}')
 
     # for i in range(100,0,-1):
     #     if max_V >= i :
@@ -83,7 +84,7 @@ for tc in range(10):
     #                 V = len(col_list)
     #             if V > max_V:
     #                 max_V = V
-    print(f'#{tc + 1} {real_max}')
+    # print(f'#{tc + 1} {real_max}')
 
     # 전치 사용해서 열 >> 행으로
     # for 문 두개 돌리면서 i,j 바뀌면서
