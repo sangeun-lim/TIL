@@ -1,0 +1,11 @@
+python -m venv venv
+source venv/Scripts/activate
+
+pip install django==3.2.12
+
+django-admin startproject <프로젝트명> .
+
+python manage.py startapp pages
+앱생성후 앱 등록
+
+python manage.py runserver
