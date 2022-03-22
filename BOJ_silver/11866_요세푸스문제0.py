@@ -45,6 +45,6 @@ while len(q) > 1:
         if i == 0 :
             i = i+ len(q)
     i = i-1
-    print(str(q.pop(i)), end=", ")
+    print(q.pop(i), end=", ")
 
-print("{}>".format(str(q.pop())))
+print(f'{q.pop()}>')
