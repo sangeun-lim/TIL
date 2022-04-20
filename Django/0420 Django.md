@@ -22,4 +22,14 @@
   settings.py에 'rest_framework' 앱 등록
   ```
 
-- 
+- ModelSerializer
+
+  - 모델 필드에 해당하는 필드가 있는 Serializer 클래스를 자동으로 만들 수 있는 shortcut
+  - 핵심 기능은 다음과 같다
+    - 모델 정보에 맞춰 자동으로 필드 생성
+    - serializer에 대한 유효성 검사기를 자동으로 생성
+    - .create() & .update()의 간단한 기본 구현이 포함됨
+  - `many` argument
+    - many=True
+      - Serializing multiple objects
+      - 단일 인스턴스 대신 QuerySet 등을 직렬화하기 위해서는 serializer를 인스턴스화 할 때 many=True를 키워드 인자로 전달해야함
