@@ -33,3 +33,5 @@
     - many=True
       - Serializing multiple objects
       - 단일 인스턴스 대신 QuerySet 등을 직렬화하기 위해서는 serializer를 인스턴스화 할 때 many=True를 키워드 인자로 전달해야함
+
+- 
