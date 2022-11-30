@@ -1,0 +1,5 @@
+L = int(input())
+T = int(input())
+x = abs(L-T)
+min_X = min(L,T)
+print(abs(x-min_X))
