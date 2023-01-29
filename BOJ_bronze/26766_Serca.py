@@ -1,0 +1,11 @@
+n = int(input())
+for i in range(n):
+    print(f' @@@   @@@  ')
+    print(f'@   @ @   @ ')
+    print(f'@    @    @ ')
+    print(f'@         @ ')
+    print(f' @       @  ')
+    print(f'  @     @   ')
+    print(f'   @   @    ')
+    print(f'    @ @     ')
+    print(f'     @      ')
