@@ -925,7 +925,229 @@ post_order(tree['A'])
 
 #--------------------------------------------------------------------#
 
+# 벨만 포드 최단 경로 알고리즘
+# 1. 출발 노드 설정
+# 2. 최단 거리 테이블 초기화
+# 3. 다음 과정 N-1번 반복
+#     1) 전체 간선 E개를 하나씩 확인
+#     2) 각 간선을 거쳐 다른 노드로 가는 비용을 계산하여 최단 거리 테이블 갱신
+# 4. 음수 간선 순환이 발생하는지 체크하고 싶다면 3번과정 한번 더 수행
+# - 이때 테이블이 갱신된다면 음수 간선 순환 존재
 
+import sys
+input = sys.stdin.readline
+INf = int(1e9) # 무한을 의미하는 값으로 10억을 설정
+
+def bf(start):
+    # 시작 노드에 대해서 초기화
+    dist[start] = 0
+    # 전체 n번의 라운드를 반복
+    for i in range(n):
+        # 매 반복마다 '모든 간선'을 확인하며
+        for j in range(m):
+            cur = edges[j][0]
+            next_node = edges[j][1]
+            cost = edges[j][2]
+            # 현재 간선을 거쳐서 다른 노드로 이동하는 거리가 더 짧은 경우
+            if dist[cur] != INF and dist[next_node] > dist[cur] + cost:
+                dist[next_node] = dist[cur] + cost
+                # n번째 라운드에서도 값이 갱신된다면 음수 순환이 존재
+                if i == n - 1:
+                    return True
+    return False
+
+# 노드의 개수, 간선의 개수를 입력받기
+n, m = map(int,input().split())
+# 모든 간선에 대한 정보를 담는 리스트 만들기
+edges = []
+# 최단 거리 테이블을 모두 무한으로 초기화
+dist = [INF] * (n+1)
+
+# 모든 간선 정보를 입력받기
+for _ in range(m):
+    a,b,c = map(int,input().split())
+    # a번 노드에서 b번 노드로 가는 비용이 c라는 의미
+    edges.append((a,b,c))
+
+# 벨만 포드 알고리즘을 수행
+negative_cycle = bf(1) # 1번 노드가 시작 노드
+
+if negative_cycle:
+    print('-1')
+else:
+    # 1번 노드를 제외한 다른 모든 노드로 가기 위한 최단 거리 출력
+    for i in range(2, n+1):
+        # 도달할 수 없는 경우, -1을 출력
+        if dist[i] == INF:
+            print('-1')
+        # 도달할 수 있는 경우 거리를 출력
+        else:
+            print(dist[i])
 
 #--------------------------------------------------------------------#
 
+# 바이너리 인덱스 트리(펜윅 트리)
+
+import sys
+input = sys.stdin.readline
+
+# 데이터의 개수, 변경 횟수, 구간 합 계산 횟수
+n, m, k = map(int,input().split())
+
+# 전체 데이터의 개수는 최대 1000000개
+arr = [0] * (n+1)
+tree = [0] * (n+1)
+
+# i번째 수까지의 누적 합을 계산하는 함수
+def prefix_sum(i):
+    result = 0
+    while i > 0:
+        result += tree[i]
+        # 0이 아닌 마지막 비트만큼 빼가면서 이동
+        i -= (i & -i)
+    return result
+
+# i번째 수를 dif만큼 더하는 함수
+def update(i, dif):
+    while i <= n:
+        tree[i] += dif
+        i += (i & -i)
+
+# start부터 end까지의 구간 합을 계산하는 함수
+def interval_sum(start,end):
+    return prefix_sum(end) - prefix_sum(start-1)
+
+for i in range(1, n+1):
+    x = int(input())
+    arr[i] = x
+    update(i, x)
+
+for i in range(m+k):
+    a,b,c = map(int,input().split())
+    # 업데이트 연산인 경우
+    if a == 1:
+        update(b, c - arr[b]) # 바뀐 크기(dif)만큼 적용
+        arr[b] = c
+    # 구간 합 연산인 경우
+    else:
+        print(interval_sum(b, c))
+
+#--------------------------------------------------------------------#
+
+# 최소 공통 조상(LCA)
+# 두 노드의 공통된 조상 중에서 가장 가까운 조상을 찾는 문제
+# 1. 모든 노드에 대한 깊이를 계산
+# 2. 최소 공통 조상을 찾을 두 노드를 확인
+#     1) 먼저 두 노드의 깊이가 동일하도록 거슬러 올라감
+#     2) 이후 부모가 같아질 떄까지 반복적으로 두 노드의 부모 방향으로 거슬러 올라감
+# 3. 모든 LCA(a,b) 연산에 대하여 2번의 과정 반복
+
+import sys
+sys.setrecursionlimit(int(1e5)) # 런타임 오류 피하기
+n = int(input())
+
+parent = [0] * (n+1) # 부모 노드 정보
+d = [0] * (n+1) # 각 노드까지의 깊이
+c = [0] * (n+1) # 각 노드의 깊이가 계산되었는지 여부
+graph = [[] for _ in range(n+1)] # 그래프 정보
+
+for _ in range(n-1):
+    a,b = map(int,input().split())
+    graph[a].append(b)
+    graph[b].append(a)
+
+# 루트 노드부터 시작하여 깊이를 구하는 함수
+def dfs(x, depth):
+    c[x] = True
+    d[x] = depth
+    for y in graph[x]:
+        if c[y]: # 이미 깊이를 구했다면 넘기기
+            continue
+        parent[y] = x
+        dfs(y, depth + 1)
+
+# A와 B의 최소 공통 조상을 찾는 함수
+def lca(a,b):
+    # 먼저 깊이가 동일하도록
+while d[a] != d[b]:
+    if d[a] > d[b]:
+        a = parent[a]
+    else:
+        b = parent[b]
+    # 노드가 같아지도록
+    while a != b:
+        a = parent[a]
+        b = parent[b]
+    return a
+
+dfs(1, 0) # 루트 노드는 1번 노드
+
+m = int(input())
+
+for i in range(m):
+    a,b = map(int,input().split())
+    print(lca(a,b))
+
+#--------------------------------------------------------------------#
+
+# 최소 공통 조상(LCA) 개선
+
+import sys
+input = sys.stdin.readline
+sys.setrecursionlimit(int(1e5)) # 런타임 오류 피하기
+LOG = 21 # 2^20 = 1,000,000
+
+n = int(input())
+parent = [[0] * LOG for _ in range(n+1)] # 부모 노드 정보
+d = [0] * (n+1) # 각 노드까지의 깊이
+c = [0] * (n+1) # 각 노드의 깊이가 계산되었는지 여부
+graph = [[] for _ in range(n+1)] # 그래프 정보
+
+for _ in range(n-1):
+    a,b = map(int,input().split())
+    graph[a].append(b)
+    graph[b].append(a)
+
+# 루트 노드부터 시작하여 깊이를 구하는 함수
+def dfs(x, depth):
+    c[x] = True
+    d[x] = depth
+    for y in graph[x]:
+        if c[y]: # 이미 깊이를 구했다면 넘기기
+            continue
+        parent[y][0] = x
+        dfs(y, depth + 1)
+
+# 전체 부모 관계를 설정하는 함수
+def set_parent():
+    dfs(1,0) # 루트 노드는 1번 노드
+    for i in range(1, LOG):
+        for j in range(1, n+1):
+            parent[j][i] = parent[parent[j][i-1]][i-1]
+
+# A와 B의 최소 공통 조상을 찾는 함수
+def lca(a,b):
+    # b가 더 깊도록 설정
+    if d[a] > d[b]:
+        a, b = b, a
+    # 먼저 깊이가 동일하도록
+    for i in range(LOG -1, -1, -1):
+        if d[b] - d[a] >= (1 << i):
+            b = parent[b][i]
+    # 부모가 같아지도록
+    if a == b:
+        return a
+    for i in range(LOG -1, -1, -1):
+        # 조상을 향해 거슬러 올라가기
+        if parent[a][i] != parent[b][i]:
+            a = parent[a][i]
+            b = parent[b][i]
+    # 이후에 부모가 찾고자 하는 조상
+    return parent[a][0]
+
+set_parent()
+
+m = int(input())
+for i in range(m):
+    a, b = map(int,input().split())
+    print(lca(a,b))
