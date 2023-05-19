@@ -37,3 +37,48 @@ for card in N_card:
         ans.append(0)
 
 print(*ans)
+
+#---------------------------------------------------#
+# 시간초과
+# pypy3로 제출
+
+import sys
+input = sys.stdin.readline
+
+M = int(input())
+M_card = sorted(list(map(int,input().split())))
+N = int(input())
+N_card = list(map(int,input().split()))
+
+for i in N_card:
+    # 인덱스의 제일 왼쪽 인덱스
+    idx = 1
+    s = 0
+    e = M -1
+    while s <= e:
+        mid = (s+e) // 2
+
+        if M_card[mid] == i:
+            idx = mid
+            e = mid - 1
+        elif M_card[mid] < i:
+            s = mid + 1
+        else:
+            e = mid - 1
+
+    # 인덱스의 제일 오른쪽 인덱스
+    idx2 = 0
+    s = 0
+    e = M -1
+    while s <= e:
+        mid = (s+e) // 2
+
+        if M_card[mid] == i:
+            idx2 = mid
+            s = mid + 1
+        elif M_card[mid] < i:
+            s = mid + 1
+        else:
+            e = mid - 1
+
+    print(idx2 - idx + 1, end = ' ')
